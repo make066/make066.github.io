@@ -20,4 +20,113 @@
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>ubuntu</title>
+    <url>/2023/09/24/ubuntu/</url>
+    <content><![CDATA[<h3 id="常用的命令软件安装"><a href="#常用的命令软件安装" class="headerlink" title="常用的命令软件安装"></a>常用的命令软件安装</h3><span id="more"></span>
+
+<h4 id="更新"><a href="#更新" class="headerlink" title="更新"></a>更新</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ apt update</span><br><span class="line">$ apt upgrade -y</span><br></pre></td></tr></table></figure>
+
+<h4 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ apt install vim curl git lsof wget bc zip unzip expect lrzsz iftop net-tools dnsutils rsync nano tmux -y</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="启用root用户远程登陆"><a href="#启用root用户远程登陆" class="headerlink" title="启用root用户远程登陆"></a>启用root用户远程登陆</h4><p>编辑&#x2F;etc&#x2F;ssh&#x2F;sshd_config文件</p>
+<p>找到配置参数：PermitRootLogin </p>
+<p>将该参数后面的值修改为yes即可</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ vim /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
+
+<p>重启ssh服务</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">systemctl restart ssh</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="时区"><a href="#时区" class="headerlink" title="时区"></a>时区</h4><p>查看当前的系统时区</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ timedatectl</span><br></pre></td></tr></table></figure>
+
+<p>修改系统时间</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ timedatectl set-timezone Asia/Shanghai</span><br></pre></td></tr></table></figure>
+
+<p>重启systemd-timesyncd服务</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ systemctl restart systemd-timesyncd.service</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="命令提示符PS1"><a href="#命令提示符PS1" class="headerlink" title="命令提示符PS1"></a>命令提示符PS1</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ vim ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p>注释掉原有的，下面新增自己喜欢的</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if [ &quot;$color_prompt&quot; = yes ]; then</span><br><span class="line">    PS1=&#x27;$&#123;debian_chroot:+($debian_chroot)&#125;\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ &#x27;</span><br><span class="line">else</span><br><span class="line">    # PS1=&#x27;$&#123;debian_chroot:+($debian_chroot)&#125;\u@\h:\w\$ &#x27;</span><br><span class="line">    PS1=&quot;\[\e[37;40m\][\[\e[32;40m\]\u\[\e[37;40m\]@\h \[\e[35;40m\]\w\[\e[0m\]]\$ &quot;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>让改变立即生效</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">source ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="设置静态IP"><a href="#设置静态IP" class="headerlink" title="设置静态IP"></a>设置静态IP</h4><p>修改配置文件</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ vim  /etc/netplan/00-installer-config.yaml</span><br></pre></td></tr></table></figure>
+
+<p>根据自己的需要配置</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">network:</span><br><span class="line">  ethernets:</span><br><span class="line">    ens32:</span><br><span class="line">      addresses: [192.168.163.70/24] # 配置的静态ip地址和掩码</span><br><span class="line">      dhcp4: false # 关闭dhcp4</span><br><span class="line">      optional: true</span><br><span class="line">      gateway4: 192.168.163.1 # 网关地址</span><br><span class="line">      nameservers:</span><br><span class="line">        addresses: [8.8.8.8,223.5.5.5] # DNS服务器地址，多个DNS服务器地址需要用英文逗号分隔开，可不配置</span><br><span class="line">  version: 2</span><br></pre></td></tr></table></figure>
+
+<p>使配置生效</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ netplan apply</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="DNS-解析"><a href="#DNS-解析" class="headerlink" title="DNS 解析"></a>DNS 解析</h4><p>修改</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ vim /etc/systemd/resolved.conf</span><br><span class="line">[Resolve]</span><br><span class="line">DNS=8.8.8.8 223.5.5.5</span><br><span class="line">#FallbackDNS=</span><br><span class="line">#Domains=</span><br><span class="line">#LLMNR=no</span><br><span class="line">------------</span><br></pre></td></tr></table></figure>
+
+<p>重启systemd-resolved服务</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ systemctl daemon-reload</span><br><span class="line">$ systemctl restart systemd-resolved.service</span><br></pre></td></tr></table></figure>
+
+<p>将&#x2F;etc&#x2F;resolv.conf链接到&#x2F;run&#x2F;systemd&#x2F;resolve&#x2F;resolv.conf</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ mv /etc/resolv.conf /etc/resolv.conf.back</span><br><span class="line">$ ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="安装-docker"><a href="#安装-docker" class="headerlink" title="安装 docker"></a>安装 docker</h4><p>卸载旧版本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">for pkg in docker.io docker-doc docker-compose podman-docker containerd runc; do sudo apt-get remove $pkg; done</span><br></pre></td></tr></table></figure>
+
+<p>使用 Apt 存储库安装</p>
+<p>设置 Docker 的 Apt 存储库。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line"># Add Docker&#x27;s official GPG key:</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install ca-certificates curl gnupg</span><br><span class="line">sudo install -m 0755 -d /etc/apt/keyrings</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg</span><br><span class="line">sudo chmod a+r /etc/apt/keyrings/docker.gpg</span><br><span class="line"></span><br><span class="line"># Add the repository to Apt sources:</span><br><span class="line">echo \</span><br><span class="line">  &quot;deb [arch=&quot;$(dpkg --print-architecture)&quot; signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \</span><br><span class="line">  &quot;$(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;)&quot; stable&quot; | \</span><br><span class="line">  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br><span class="line">sudo apt-get update</span><br></pre></td></tr></table></figure>
+
+<p>安装 Docker 软件包。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin</span><br></pre></td></tr></table></figure>
+
+<p>通过运行映像验证 Docker 引擎安装是否成功。<code>hello-world</code></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo docker run hello-world</span><br></pre></td></tr></table></figure>
+
+
+
+<p>使用便捷脚本安装</p>
+<p>此示例从<a href="https://get.docker.com/">get.docker.com</a>下载脚本 并运行它以在 Linux 上安装最新的稳定版本的 Docker：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">$ curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">$ sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
+
+
+
+<p>卸载 Docker 引擎</p>
+<p>卸载 Docker Engine、CLI、containerd 和 Docker Compose 软件包：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo apt-get purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras</span><br></pre></td></tr></table></figure>
+
+<p>主机上的映像、容器、卷或自定义配置文件 不会自动移除。要删除所有映像、容器和卷，请执行以下操作：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sudo rm -rf /var/lib/docker</span><br><span class="line">sudo rm -rf /var/lib/containerd</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></content>
+      <tags>
+        <tag>linux</tag>
+      </tags>
+  </entry>
 </search>
